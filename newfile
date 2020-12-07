@@ -1,0 +1,65 @@
+git的常用命令
+
+git add read.txt  //将read.txt添加到暂存区中去。
+git commit -m "read.txt" //read.txt提交到仓库中， “read.txt”时提交的注释
+git status  //用来查看是否还有文件未提交
+git diff read.txt //用来查看read.txt到底修改了什么内容
+git status  //提交之前一般要查看一下状态
+版本回退
+git log  //查看修改的历史记录
+git log --pretty=oneline  //简化版
+git reset --hard HEAD^  //版本回退到上一个版本
+git reset --hard HEAD~100  //版本回退到前100个版本。
+cat read.txt   //查看当前文件的内容
+git reset  -- hard 版本号  // 但是版本号一般未知
+git  reflog  //获取每次版本的版本号
+git reset --hard 6fcfc89 //用来恢复6fcfc89版本的内容
+将git提交文件到版本库中有两步：
+1.是使用git add 把文件添加进去，实际上就是将文件添加到暂存区。
+2.使用git commit提交修改，实际上就是把暂存区的所有内容提交到当前分支上。
+使用命令进行撤销操作的方法
+git checkout -- read.txt
+其意思是将read.txt文件在工作区做的修改全部撤销，这里有2种情况，如下：
+1.read.txt自动修改后，还没有放到暂存区，使用撤销操作就回到和版本库一样的状态。
+2.另外一种情况是read.txt已经放入到暂存区中，接着又做了修改，撤销操作会回到添加暂存区的状态。
+删除文件
+rm b.txt //将 b.txt文件删除
+在没有commit 之前，如果想恢复b.txt怎样操作呢
+git checkout -- b.txt  //恢复b.txt文件
+git log 状态的退出，使用英文状态下的q键即可退出
+
+
+如何解决冲突
+树冲突
+文件名修改造成的冲突，称为树冲突。
+比如，A同事把文件改名为A.C，B同事把同一个文件改名为B.C，那么B同事将这两个commit合并时，会产生冲突。
+如果最终确定用B同事的文件名，那么解决办法如下：
+git rm A.C
+git rm origin-name.C
+git add B.C
+git commit
+如果最终确定用A同事的文件名，那么解决办法如下：
+git rm B.C
+git rm origin-name.C
+git add A.C
+git commit
+内容冲突（git pull拉取最新代码发现）
+一般来讲，出现冲突时都会有“CONFLICT”字样，特别的直接报错repo sync的报错，可能并不是直接提示冲突
+现在，需要进入报错的项目（git库）目录，然后执行git rebase解决：
+git rebase remote -branch-name
+冲突解决的一般步骤
+merge/patch的冲突解决
+先编辑冲突，然后git commit提交。
+对于git来讲，编辑冲突跟平时的修改代码没什么差异。修改完成后，都是要把修改添加到缓存，然后commit。
+rebase的冲突解决
+rebase的冲突解决过程，就是解决每个应用补丁冲突的过程。
+解决完一个补丁应用的冲突后，执行下面命令标记冲突已解决（也就是把修改内容加入缓存）
+git add -u       -u 表示把所有已track的文件的新的修改加入缓存，但不加入新的文件。
+然后执行下面命令继续rebase：
+git rebase --continue
+有冲突继续解决，重复这这些步骤，直到rebase完成。
+如果中间遇到某个补丁不需要应用，可以用下面命令忽略：
+git rebase --skip
+如果想回到rebase执行之前的状态，可以执行：
+git rebase --abort
+注：rebase之后，不需要执行commit，也不存在新的修改需要提交，都是git自动完成。
